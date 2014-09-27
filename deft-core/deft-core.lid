@@ -6,3 +6,5 @@ files: library
        projects
        registries
        version
+       templates
+
