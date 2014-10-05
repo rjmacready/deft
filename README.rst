@@ -40,11 +40,12 @@ Usage
 -----
 
 ::
+
    deft
    > open deft
    > show registries
    > build
-   > show reports
+   > test
    > close deft
 
 
