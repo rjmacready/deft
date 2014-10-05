@@ -35,3 +35,54 @@ If you want to change the install destination, you can override
 the ``INSTALL_DIR``::
 
     make install INSTALL_DIR=/usr/local/deft
+
+Usage
+-----
+
+::
+   deft
+   > open deft
+   > show registries
+   > build
+   > show reports
+   > close deft
+
+
+Commands
+--------
+
+::
+
+    (deft-new)
+    new application PROJECT-NAME
+    new library PROJECT-NAME
+    
+    (deft-core)
+    open PROJECT
+    close PROJECT
+    show deft config
+    show project [PROJECT]
+    show registries
+    show deft version
+    show dylan version
+
+    (deft-build)
+    build [PROJECT] [VERBOSE?]
+    clean [PROJECT]
+    show reports
+    report [REPORT] [PROJECT] [FORMAT]
+
+    (deft-browse)
+    inspect DYLAN-OBJECT-NAME
+
+    (deft-graph)
+    graph [PROJECT]
+
+    (deft-test)
+    show tests
+    test
+
+    (deft-dfmc)
+    dfmc trace set (text|html)
+    dfmc trace show
+    dfmc trace clear

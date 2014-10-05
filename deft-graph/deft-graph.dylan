@@ -125,46 +125,21 @@ define method walk (module :: <module-object>, edge :: <defines>) => ()
   end;
 end method;
 
-define function make-leaf(prefix :: <string>, object :: <environment-object>, edge :: <edge-type>) => ()
+define function make-node(prefix :: <string>, object :: <environment-object>, edge :: <edge-type>) => ()
   let node-label = format-to-string("%s:%s", prefix, dylan-name(object));
   let node = create-node!(node-label);
   
   create-edge(*graph*, *parent-node*, node, label: format-to-string("%=", edge));  
 end function;
 
+// <class-object>, <method-object>, <constant-object>, ...
 define method walk (object :: <environment-object>, edge :: <defines>) => ()
-  make-leaf("", object, edge);
-  // nothing
+  make-node("", object, edge);
 end method;
 
-/*
-define method walk (class-object :: <class-object>, edge :: <defines>) => ()
-  make-leaf("Class", class-object, edge);
-end method;
 
-define method walk (method-object :: <method-object>, edge :: <defines>) => ()
-  make-leaf("Method", method-object, edge);
-end method;
-
-define method walk (const-object :: <constant-object>, edge :: <defines>) => ()
-  make-leaf("Constant", const-object, edge);
-end method;
-
-define method walk (const-object :: <domain-object>, edge :: <defines>) => ()
-  make-leaf("Domain", const-object, edge);
-end method;
-
-define method walk (const-object :: <generic-function-object>, edge :: <defines>) => ()
-  make-leaf("Generic function", const-object, edge);
-end method;
-
-define method walk (object :: <macro-object>, edge :: <defines>) => ()
-  make-leaf("Macro", object, edge);
-end method;
-*/
-
-define function export-to-graph()
-  let project = dylan-current-project($deft-context);
+define function deft-graph-project(project-name :: false-or(<string>)) => ()
+  let project = dylan-current-project($deft-context, project-name);
   if (project)
       dynamic-bind(*root-project* = project, 
 		   *node-dictionary* = make(<case-insensitive-string-table>),
@@ -185,172 +160,13 @@ define function export-to-graph()
       format-out("open a project first\n");
   end if;
 end function;
-/*
-define function export-to-graph-old()
-  let modules-node-table = make(<case-insensitive-string-table>);
 
-  let project = dylan-current-project($deft-context);
-  if (project)
-
-    open-project-compiler-database(project);
-    parse-project-source(project);
-  
-    let graph = make(<graph>);
-    let project-node = create-node(graph, 
-				   label: format-to-string("P:%s", project-name(project)));
-    
-    //let project-used-libraries = project-used-libraries(project, project);
-    //for (library in project-used-libraries)
-    //  format-out("library used %= (%=)\n", library, dylan-name(project, library));
-    //end for;
-    
-    let library = project-library(project);
-    if (library)
-      format-out("library %= (%=)\n", library, dylan-name(project, library));
-      
-      let library-node = create-node(graph, 
-				     label: format-to-string("L:%s",
-							     dylan-name(project, library)));
-      library-node.attributes["shape"] := "box";
-      library-node.attributes["style"] := "filled";
-      library-node.attributes["color"] := ".7 .3 1.0";
-      
-      create-edge(graph, project-node, library-node, label: "has library");
-
-      do-library-modules((method(module)
-			    let module-name = dylan-name(project, module);
-			    format-out("visible module %= (%=)\n", module, module-name);
-			    
-			    module-name := format-to-string("M:%s", module-name);
-			    
-			    let module-node = element(modules-node-table, module-name, default: #f);
-			    if (~module-node)
-			      module-node := create-node(graph, label: module-name);
-			      modules-node-table[module-name] := module-node;
-			    end if;
-			    
-			    create-edge(graph, library-node, module-node, label:"can see");
-			    
-			 end), project, library);
-      
-      do-library-modules((method(module)
-
-			    let module-name = dylan-name(project, module);
-			    
-			    format-out("defined module %= (%=) at %=\n", module, 
-				       module-name,
-				       environment-object-source-location(project, module));
-		
-			    
-			    //let defined-module-node = create-node(graph,
-			    //					  label: format-to-string("M:%s", dylan-name(project, module)));
-			    //create-edge(graph, library-node, defined-module-node, label: "defines module");
-			    
-			    module-name := format-to-string("M:%s", module-name);
-			    
-			    let defined-module-node = element(modules-node-table, module-name, default: #f);
-			    if (~defined-module-node)
-			      defined-module-node := create-node(graph, label: module-name);
-			      modules-node-table[module-name] := defined-module-node;
-			    end if;
-			    
-			    create-edge(graph, library-node, defined-module-node, label:"defines module");
-			    
-			    
-			    do-used-definitions((method(def)
-						   let def-name = dylan-name(project, def);
-						   
-						   format-out(" a used module %= (%=) at %=\n", def,
-							      def-name,
-							      environment-object-source-location(project, def));
-						   
-						   def-name := format-to-string("M:%s", def-name);
-			    
-						   let used-module-node = element(modules-node-table, def-name, default: #f);
-						   if (~used-module-node)
-						     used-module-node := create-node(graph, label: def-name);
-						     modules-node-table[def-name] := used-module-node;
-						   end if;
-						   
-						   create-edge(graph, defined-module-node, used-module-node, label:"uses module");
-						   
-						end), project, module);
-
-			    do-module-definitions((method(def)
-						     let defined-name = dylan-name(project, def);
-						     
-						     format-out(" a definition %= (%=) at %=\n", def,
-								defined-name,
-								environment-object-source-location(project, def));
-						     
-						     let definition-node = create-node(graph,
-										       label: format-to-string("D:%s", defined-name));
-						     create-edge(graph, defined-module-node, definition-node, label: "defines");
-						     
-						     format-out("\n");
-						     format-out("%=", 
-								environment-object-source(project, def));
-						     format-out("\n");
-
-						     // TODO check argument's types
-						     // TODO check return type
-						     // TODO try to get definition body
-
-						     do-used-definitions((method(another)
-									    format-out("   something %= (%=)\n", another, dylan-name(project, another));
-									  end),
-									 project, def);
-						   end), project, module);
-			    
-			 end), project, library, imported?: #f);
-
-      do-used-definitions((method(module)
-			    format-out("used definition %= (%=)\n", module, dylan-name(project, module));
-			 end), project, library);
-
-      /*
-      let modules = library-modules(project, library);
-      for(module in modules)
-	format-out("module %= (%=)\n", module, dylan-name(project, module));
-	do-module-definitions((method (def)
-				 format-out(" def %= (%=)\n", def, dylan-name(project, def));
-			       end) ,project, module)
-      end for;
-      */
-      /*
-	let object = find-environment-object(project, name,
-	library: library,
-	module: first(library-modules(project, library)) );
-	print-environment-object(project, object); 
-	*/
-
-      
-      
-      let file-name = "test";
-      with-open-file (file = concatenate(file-name, ".dot"), direction: #"output", if-exists: #"overwrite")
-	generate-dot(graph, file);
-      end;
-      format-out("wrote dot: %s.dot\n", file-name);
-      with-open-file (file = concatenate(file-name, ".gml"), direction: #"output", if-exists: #"overwrite")
-	generate-gml(graph, file);
-      end;
-
-      format-out("wrote gml: %s.gml\n", file-name);
-      
-    else
-      format-out("no library?");
-    end if
-  else
-    format-out("no project?");
-  end if
-end function;
-*/
 
 define command graph ($deft-commands)
-  help "Exports a graph.";
-//  simple parameter dylan-project-name :: <string>,
-//   help: "the dylan project",
-//    required?: #t;
+  help "Exports a graph with the dependencies between objects.";
+  simple parameter project :: <string>,
+    help: "The project to clean. If not specified, defaults to the current project.",
+    node-class: <open-dylan-project-parameter>;
   implementation
-    export-to-graph();
+    deft-graph-project(project);
 end;

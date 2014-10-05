@@ -10,6 +10,7 @@
     "ext/command-interface/registry",
     "ext/json/registry",
     "ext/serialization/registry",
-    "ext/http/registry"
+    "ext/http/registry",
+    "ext/graphviz-renderer/registry"
   ]
 }
