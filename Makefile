@@ -9,7 +9,7 @@ INSTALL_DIR ?= /opt/deft
 APP_SOURCES = $(wildcard */*.dylan) \
               $(wildcard */*.lid)
 
-REGISTRIES = `pwd`/registry:`pwd`/ext/command-interface/registry:`pwd`/ext/json/registry:`pwd`/ext/serialization/registry:`pwd`/ext/http/registry
+REGISTRIES = `pwd`/registry:`pwd`/ext/command-interface/registry:`pwd`/ext/json/registry:`pwd`/ext/serialization/registry:`pwd`/ext/http/registry:`pwd`/ext/graphviz-renderer/registry
 
 ifeq (, $(wildcard .git))
 check-submodules:

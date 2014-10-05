@@ -6,10 +6,12 @@ define library deft-graph
   use common-dylan;
   use command-interface;
   use collections;
+  use dylan;
+  use graphviz-renderer;
   use io;
   use registry-projects;
   use system;
-
+  
   use deft-core;
   use deft-dfmc;
 
@@ -22,15 +24,20 @@ define module deft-graph
   use common-dylan;
   use command-interface,
     rename: { parameter-name => command-parameter-name };
+  use dylan;
   use file-system;
+  use format;
   use format-out;
+  use graphviz-renderer;
   use locators;
   use operating-system,
     exclude: { load-library,
                run-application  };
+  use print;
   use registry-projects;
   use table-extensions;
-
+  use threads;
+  
   use deft-core;
   use deft-dfmc;
 

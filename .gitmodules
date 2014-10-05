@@ -13,3 +13,6 @@
 [submodule "deft-dfmc/static/graph"]
 	path = deft-dfmc/static/graph
 	url = https://github.com/hannesm/graph.js.git
+[submodule "ext/graphviz-renderer"]
+	path = ext/graphviz-renderer
+	url = https://github.com/dylan-lang/graphviz-renderer
