@@ -100,15 +100,7 @@ define method walk (library :: <library-object>, edge :: <edge-type>) => ()
   end;
 end method;
 
-define method walk (module :: <module-object>, edge :: <sees>) => ()
-   // don't follow a module that we see
-end method;
-
-define method walk (module :: <module-object>, edge :: <uses>) => ()
-  // don't follow a module that we use
-end method;
-
-define method walk (module :: <module-object>, edge :: <defines>) => ()
+define function walk-module (module :: <module-object>, edge :: <edge-type>)
   let node-label = format-to-string("M:%s", dylan-name(module));
   let node = create-node!(node-label);
     
@@ -123,6 +115,18 @@ define method walk (module :: <module-object>, edge :: <defines>) => ()
 			    walk(def, $defines);
 			  end, *root-project*, module);
   end;
+end function;
+
+define method walk (module :: <module-object>, edge :: <sees>) => ()
+   // don't follow a module that we see
+end method;
+
+define method walk (module :: <module-object>, edge :: <uses>) => ()
+  walk-module(module, edge);
+end method;
+
+define method walk (module :: <module-object>, edge :: <defines>) => ()
+  walk-module(module, edge);
 end method;
 
 define function make-node(prefix :: <string>, object :: <environment-object>, edge :: <edge-type>) => ()
@@ -134,12 +138,12 @@ end function;
 
 // <class-object>, <method-object>, <constant-object>, ...
 define method walk (object :: <environment-object>, edge :: <defines>) => ()
-  make-node("", object, edge);
+  // make-node("", object, edge);
 end method;
 
 
-define function deft-graph-project(project-name :: false-or(<string>)) => ()
-  let project = dylan-current-project($deft-context, project-name);
+define function deft-graph-project(name :: false-or(<string>)) => ()
+  let project = dylan-project($deft-context, name);
   if (project)
       dynamic-bind(*root-project* = project, 
 		   *node-dictionary* = make(<case-insensitive-string-table>),

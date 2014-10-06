@@ -49,6 +49,7 @@ Usage
    > close deft
 
 
+
 Commands
 --------
 
