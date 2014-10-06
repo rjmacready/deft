@@ -41,11 +41,12 @@ end;
 
 define command deploy docker ($deft-commands)
   help "Create a Dockerfile for a project";
-  simple parameter project-name :: <string>,
-    help: "Project ...",
-    required?: #t;
+  simple parameter version :: <string>,
+    help: "For now either 2013.2 or latest";
   implementation
     begin
-      format-out("TODO\n");
+      let p = dylan-project($deft-context, #f);
+      let exe-name = project-executable-name(p);
+      format-out($docker-file-template, version,  exe-name);
     end;
 end;
