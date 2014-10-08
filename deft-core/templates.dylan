@@ -1,6 +1,6 @@
 module: deft-core
 synopsis:
-author: Fabrice Leal
+author: Fabrice Leal; Bruce Mitchener, Jr
 copyright: See LICENSE file in this distribution.
 
 // The <template> class is used to encapsulate constant format strings                                                                        

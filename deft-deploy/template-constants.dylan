@@ -1,4 +1,6 @@
-Module: deft-deploy
+module: deft-deploy
+author: Fabrice Leal
+copyright: See LICENSE file in this distribution.
 
 //define constant $heroku-fname-template :: <string> = "Procfile"
 define constant $heroku-file-template :: <string> = 
