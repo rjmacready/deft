@@ -7,4 +7,4 @@ define constant $heroku-file-template :: <string> =
 define constant $docker-file-template :: <string> =
   ("FROM rjmacready/opendylan:%s-onbuild\n"
    "\n"
-   "CMD [\"%s\"]");
+   "CMD [\"_build/bin/%s\"]\n");
